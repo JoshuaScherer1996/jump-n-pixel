@@ -244,7 +244,8 @@ MonoBehaviour:
   movementSpeed: 6
   acceleration: 70
   deceleration: 100
-  jumpSpeed: 13
+  jumpSpeed: 13.634515
+  coyoteTime: 0.12
   groundLayers:
     serializedVersion: 2
     m_Bits: 256

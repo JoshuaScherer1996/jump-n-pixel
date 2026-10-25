@@ -9,7 +9,8 @@ public sealed class PlayerController2D : MonoBehaviour
     [SerializeField, Min(0.1f)] private float movementSpeed = 6f;
     [SerializeField, Min(0.1f)] private float acceleration = 70f;
     [SerializeField, Min(0.1f)] private float deceleration = 100f;
-    [SerializeField, Min(0.1f)] private float jumpSpeed = 13f;
+    [SerializeField, Min(0.1f)] private float jumpSpeed = 13.634515f;
+    [SerializeField, Min(0f)] private float coyoteTime = 0.12f;
     [SerializeField] private LayerMask groundLayers;
     [SerializeField, Min(0.001f)] private float groundCheckDistance = 0.06f;
 
@@ -22,6 +23,8 @@ public sealed class PlayerController2D : MonoBehaviour
     private InputAction jumpAction;
     private float horizontalInput;
     private bool jumpRequested;
+    private bool jumpAvailable;
+    private double coyoteUntil = double.NegativeInfinity;
 
     public Vector2 Velocity => body.linearVelocity;
     public bool IsGrounded { get; private set; }
@@ -41,6 +44,8 @@ public sealed class PlayerController2D : MonoBehaviour
     {
         horizontalInput = 0f;
         jumpRequested = false;
+        jumpAvailable = false;
+        coyoteUntil = double.NegativeInfinity;
         jumpAction.performed += RequestJump;
         moveAction.Enable();
         jumpAction.Enable();
@@ -54,6 +59,8 @@ public sealed class PlayerController2D : MonoBehaviour
         horizontalInput = 0f;
         jumpRequested = false;
         IsGrounded = false;
+        jumpAvailable = false;
+        coyoteUntil = double.NegativeInfinity;
         body.linearVelocity = new Vector2(0f, body.linearVelocity.y);
     }
 
@@ -70,16 +77,27 @@ public sealed class PlayerController2D : MonoBehaviour
 
     private void FixedUpdate()
     {
+        var wasGrounded = IsGrounded;
         IsGrounded = CheckGrounded();
+        if (IsGrounded)
+        {
+            jumpAvailable = true;
+        }
+        else if (wasGrounded && jumpAvailable)
+        {
+            coyoteUntil = Time.fixedTimeAsDouble + coyoteTime;
+        }
         var velocity = body.linearVelocity;
         var targetSpeed = horizontalInput * movementSpeed;
         var speedChange = Mathf.Abs(targetSpeed) > 0.01f ? acceleration : deceleration;
         velocity.x = Mathf.MoveTowards(velocity.x, targetSpeed, speedChange * Time.fixedDeltaTime);
 
-        if (jumpRequested && IsGrounded)
+        if (jumpRequested && jumpAvailable && (IsGrounded || Time.fixedTimeAsDouble < coyoteUntil))
         {
             velocity.y = jumpSpeed;
             IsGrounded = false;
+            jumpAvailable = false;
+            coyoteUntil = double.NegativeInfinity;
         }
 
         jumpRequested = false;
