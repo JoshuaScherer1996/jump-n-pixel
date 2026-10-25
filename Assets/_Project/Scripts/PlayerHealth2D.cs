@@ -7,7 +7,6 @@ public sealed class PlayerHealth2D : MonoBehaviour
 {
     [SerializeField, Min(1)] private int maximumHealth = 3;
     [SerializeField, Min(0.01f)] private float invulnerabilityTime = 0.75f;
-    [SerializeField, Min(0.01f)] private float respawnProtectionTime = 1f;
 
     private PlayerController2D controller;
     private Vector3 spawnPosition;
@@ -30,7 +29,17 @@ public sealed class PlayerHealth2D : MonoBehaviour
 
     public bool TryTakeDamage(int damage = 1, Vector2 knockback = default)
     {
-        if (!isActiveAndEnabled || damage <= 0 || IsInvulnerable || CurrentHealth <= 0)
+        return TryApplyDamage(damage, knockback, false);
+    }
+
+    public bool TryTakeSpikeDamage(int damage, Vector2 knockback)
+    {
+        return TryApplyDamage(damage, knockback, true);
+    }
+
+    private bool TryApplyDamage(int damage, Vector2 knockback, bool bypassInvulnerability)
+    {
+        if (!isActiveAndEnabled || damage <= 0 || (!bypassInvulnerability && IsInvulnerable) || CurrentHealth <= 0)
             return false;
 
         invulnerableUntil = Time.timeAsDouble + invulnerabilityTime;
@@ -58,7 +67,7 @@ public sealed class PlayerHealth2D : MonoBehaviour
 
     private void Respawn()
     {
-        invulnerableUntil = Time.timeAsDouble + Mathf.Max(invulnerabilityTime, respawnProtectionTime);
+        invulnerableUntil = double.NegativeInfinity;
         SetShield(false);
         controller.RespawnAt(spawnPosition);
         CurrentHealth = MaximumHealth;

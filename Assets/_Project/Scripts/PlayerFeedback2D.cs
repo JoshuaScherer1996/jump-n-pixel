@@ -43,7 +43,18 @@ public sealed class PlayerFeedback2D : MonoBehaviour
         wasInvulnerable = isInvulnerable;
     }
 
+    private void OnEnable()
+    {
+        health.Respawned += ResetFeedback;
+    }
+
     private void OnDisable()
+    {
+        health.Respawned -= ResetFeedback;
+        ResetFeedback();
+    }
+
+    private void ResetFeedback()
     {
         if (spriteRenderers == null)
             return;
@@ -55,5 +66,6 @@ public sealed class PlayerFeedback2D : MonoBehaviour
         }
 
         wasInvulnerable = false;
+        pulseStartedAt = 0f;
     }
 }

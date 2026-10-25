@@ -267,7 +267,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth2D
   maximumHealth: 3
   invulnerabilityTime: 0.75
-  respawnProtectionTime: 1
 --- !u!114 &6271616288557447619
 MonoBehaviour:
   m_ObjectHideFlags: 0
