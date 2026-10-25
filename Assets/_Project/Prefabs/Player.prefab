@@ -142,6 +142,7 @@ GameObject:
   - component: {fileID: 4067790118634836420}
   - component: {fileID: 8810115976562485422}
   - component: {fileID: 562027971600912871}
+  - component: {fileID: 6271616288557447619}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -251,6 +252,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   groundCheckDistance: 0.06
+  knockbackDuration: 0.15
 --- !u!114 &562027971600912871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,3 +268,18 @@ MonoBehaviour:
   maximumHealth: 3
   invulnerabilityTime: 0.75
   respawnProtectionTime: 1
+--- !u!114 &6271616288557447619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6699400113049494944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b90e25c66e58eb9428922f6200bd36a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerFeedback2D
+  minimumAlpha: 0.45
+  pulseFrequency: 5
+  shieldTint: {r: 0.65, g: 1, b: 0.65, a: 1}

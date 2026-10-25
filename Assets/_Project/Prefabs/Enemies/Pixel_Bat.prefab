@@ -104,7 +104,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 1c0c89715b962e54892d01e7a01d7b98, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -124,7 +124,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -154,6 +154,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyInteraction2D
   contactDamage: 1
   points: 50
-  bounceSpeed: 8
-  stompTolerance: 0.04
-  stompHorizontalInset: 0.2
+  horizontalKnockback: 4
+  verticalKnockback: 3.5
+  stompTolerance: 0.08
+  minimumStompOverlap: 0.04
+  minimumStompNormal: 0.35

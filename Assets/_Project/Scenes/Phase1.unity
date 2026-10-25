@@ -21871,6 +21871,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HazardDamage2D
   damage: 1
+  knockbackJumpFraction: 0.5
 --- !u!19719996 &1496299084
 TilemapCollider2D:
   m_ObjectHideFlags: 0

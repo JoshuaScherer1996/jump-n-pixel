@@ -28,7 +28,7 @@ public sealed class PlayerHealth2D : MonoBehaviour
         CurrentHealth = maximumHealth;
     }
 
-    public bool TryTakeDamage(int damage = 1)
+    public bool TryTakeDamage(int damage = 1, Vector2 knockback = default)
     {
         if (!isActiveAndEnabled || damage <= 0 || IsInvulnerable || CurrentHealth <= 0)
             return false;
@@ -36,11 +36,14 @@ public sealed class PlayerHealth2D : MonoBehaviour
         invulnerableUntil = Time.timeAsDouble + invulnerabilityTime;
         if (HasShield)
         {
+            controller.ApplyKnockback(knockback);
             SetShield(false);
             return true;
         }
 
         CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
+        if (CurrentHealth > 0)
+            controller.ApplyKnockback(knockback);
         HealthChanged?.Invoke(CurrentHealth, MaximumHealth);
         if (CurrentHealth == 0)
             Respawn();

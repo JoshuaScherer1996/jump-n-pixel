@@ -13,6 +13,7 @@ public sealed class PlayerController2D : MonoBehaviour
     [SerializeField, Min(0f)] private float coyoteTime = 0.12f;
     [SerializeField] private LayerMask groundLayers;
     [SerializeField, Min(0.001f)] private float groundCheckDistance = 0.06f;
+    [SerializeField, Min(0f)] private float knockbackDuration = 0.15f;
 
     private readonly RaycastHit2D[] groundHits = new RaycastHit2D[8];
     private Rigidbody2D body;
@@ -25,8 +26,11 @@ public sealed class PlayerController2D : MonoBehaviour
     private bool jumpRequested;
     private bool jumpAvailable;
     private double coyoteUntil = double.NegativeInfinity;
+    private double knockbackUntil = double.NegativeInfinity;
 
     public Vector2 Velocity => body.linearVelocity;
+    public Vector2 PrePhysicsVelocity { get; private set; }
+    public float JumpSpeed => jumpSpeed;
     public bool IsGrounded { get; private set; }
     public Vector2 PreviousFootPosition { get; private set; }
     public Vector2 FootPosition => new Vector2(bodyCollider.bounds.center.x, bodyCollider.bounds.min.y);
@@ -45,6 +49,7 @@ public sealed class PlayerController2D : MonoBehaviour
 
     private void OnEnable()
     {
+        knockbackUntil = double.NegativeInfinity;
         horizontalInput = 0f;
         jumpRequested = false;
         jumpAvailable = false;
@@ -56,6 +61,7 @@ public sealed class PlayerController2D : MonoBehaviour
 
     private void OnDisable()
     {
+        knockbackUntil = double.NegativeInfinity;
         jumpAction.performed -= RequestJump;
         moveAction.Disable();
         jumpAction.Disable();
@@ -92,11 +98,15 @@ public sealed class PlayerController2D : MonoBehaviour
             coyoteUntil = Time.fixedTimeAsDouble + coyoteTime;
         }
         var velocity = body.linearVelocity;
-        var targetSpeed = horizontalInput * movementSpeed;
-        var speedChange = Mathf.Abs(targetSpeed) > 0.01f ? acceleration : deceleration;
-        velocity.x = Mathf.MoveTowards(velocity.x, targetSpeed, speedChange * Time.fixedDeltaTime);
+        var isKnockedBack = Time.fixedTimeAsDouble < knockbackUntil;
+        if (!isKnockedBack)
+        {
+            var targetSpeed = horizontalInput * movementSpeed;
+            var speedChange = Mathf.Abs(targetSpeed) > 0.01f ? acceleration : deceleration;
+            velocity.x = Mathf.MoveTowards(velocity.x, targetSpeed, speedChange * Time.fixedDeltaTime);
+        }
 
-        if (jumpRequested && jumpAvailable && (IsGrounded || Time.fixedTimeAsDouble < coyoteUntil))
+        if (!isKnockedBack && jumpRequested && jumpAvailable && (IsGrounded || Time.fixedTimeAsDouble < coyoteUntil))
         {
             velocity.y = jumpSpeed;
             IsGrounded = false;
@@ -106,16 +116,30 @@ public sealed class PlayerController2D : MonoBehaviour
 
         jumpRequested = false;
         body.linearVelocity = velocity;
+        PrePhysicsVelocity = velocity;
     }
 
-    public void Bounce(float speed)
+    public void Bounce()
     {
-        body.linearVelocity = new Vector2(body.linearVelocity.x, speed);
+        knockbackUntil = double.NegativeInfinity;
+        body.linearVelocity = new Vector2(PrePhysicsVelocity.x, jumpSpeed);
+        ResetJumpState();
+    }
+
+    public void ApplyKnockback(Vector2 velocity)
+    {
+        if (velocity == Vector2.zero)
+            return;
+
+        body.linearVelocity = velocity;
+        knockbackUntil = Time.fixedTimeAsDouble + knockbackDuration;
         ResetJumpState();
     }
 
     public void RespawnAt(Vector3 position)
     {
+        knockbackUntil = double.NegativeInfinity;
+        PrePhysicsVelocity = Vector2.zero;
         transform.position = position;
         body.position = position;
         body.linearVelocity = Vector2.zero;
