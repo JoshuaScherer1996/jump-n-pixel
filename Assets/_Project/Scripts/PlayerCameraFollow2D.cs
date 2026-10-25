@@ -10,10 +10,10 @@ public sealed class PlayerCameraFollow2D : MonoBehaviour
 {
     [SerializeField] private Transform target;
     [SerializeField] private Tilemap[] levelTilemaps;
+    [SerializeField] private float verticalOffset;
 
     private Camera followingCamera;
     private PixelPerfectCamera pixelPerfectCamera;
-    private float fixedHeight;
     private float fixedDepth;
     private Bounds levelBounds;
     private bool hasLevelBounds;
@@ -22,7 +22,6 @@ public sealed class PlayerCameraFollow2D : MonoBehaviour
     {
         followingCamera = GetComponent<Camera>();
         pixelPerfectCamera = GetComponent<PixelPerfectCamera>();
-        fixedHeight = transform.position.y;
         fixedDepth = transform.position.z;
         FindLevelBounds();
     }
@@ -63,9 +62,10 @@ public sealed class PlayerCameraFollow2D : MonoBehaviour
 
         var halfHeight = followingCamera.orthographicSize;
         var halfWidth = followingCamera.orthographicSize * followingCamera.aspect;
+        var desiredHeight = target.position.y + verticalOffset;
         transform.position = new Vector3(
             ConstrainAxis(target.position.x, levelBounds.min.x, levelBounds.max.x, halfWidth),
-            ConstrainAxis(fixedHeight, levelBounds.min.y, levelBounds.max.y, halfHeight),
+            ConstrainAxis(desiredHeight, levelBounds.min.y, levelBounds.max.y, halfHeight),
             fixedDepth);
     }
 
