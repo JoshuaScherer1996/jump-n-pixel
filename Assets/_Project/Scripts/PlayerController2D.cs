@@ -25,10 +25,12 @@ public sealed class PlayerController2D : MonoBehaviour
     private float horizontalInput;
     private bool jumpRequested;
     private bool jumpAvailable;
+    private bool gameplayPaused;
     private double coyoteUntil = double.NegativeInfinity;
     private double knockbackUntil = double.NegativeInfinity;
 
     public Vector2 Velocity => body.linearVelocity;
+    public InputAction JumpAction => jumpAction;
     public Vector2 PrePhysicsVelocity { get; private set; }
     public float JumpSpeed => jumpSpeed;
     public bool IsGrounded { get; private set; }
@@ -81,11 +83,17 @@ public sealed class PlayerController2D : MonoBehaviour
 
     private void Update()
     {
+        if (gameplayPaused)
+            return;
+
         horizontalInput = Mathf.Clamp(moveAction.ReadValue<Vector2>().x, -1f, 1f);
     }
 
     private void FixedUpdate()
     {
+        if (gameplayPaused)
+            return;
+
         PreviousFootPosition = FootPosition;
         var wasGrounded = IsGrounded;
         IsGrounded = CheckGrounded();
@@ -158,9 +166,17 @@ public sealed class PlayerController2D : MonoBehaviour
         coyoteUntil = double.NegativeInfinity;
     }
 
+    public void SetGameplayPaused(bool paused)
+    {
+        gameplayPaused = paused;
+        horizontalInput = 0f;
+        ResetJumpState();
+    }
+
     private void RequestJump(InputAction.CallbackContext context)
     {
-        jumpRequested = true;
+        if (!gameplayPaused)
+            jumpRequested = true;
     }
 
     private bool CheckGrounded()
