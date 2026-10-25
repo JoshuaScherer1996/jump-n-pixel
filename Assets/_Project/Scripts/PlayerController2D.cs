@@ -28,11 +28,14 @@ public sealed class PlayerController2D : MonoBehaviour
 
     public Vector2 Velocity => body.linearVelocity;
     public bool IsGrounded { get; private set; }
+    public Vector2 PreviousFootPosition { get; private set; }
+    public Vector2 FootPosition => new Vector2(bodyCollider.bounds.center.x, bodyCollider.bounds.min.y);
 
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         bodyCollider = GetComponent<CapsuleCollider2D>();
+        PreviousFootPosition = FootPosition;
         groundFilter = new ContactFilter2D { useTriggers = false };
         groundFilter.SetLayerMask(groundLayers);
         runtimeActions = Instantiate(inputActions);
@@ -77,6 +80,7 @@ public sealed class PlayerController2D : MonoBehaviour
 
     private void FixedUpdate()
     {
+        PreviousFootPosition = FootPosition;
         var wasGrounded = IsGrounded;
         IsGrounded = CheckGrounded();
         if (IsGrounded)
@@ -102,6 +106,32 @@ public sealed class PlayerController2D : MonoBehaviour
 
         jumpRequested = false;
         body.linearVelocity = velocity;
+    }
+
+    public void Bounce(float speed)
+    {
+        body.linearVelocity = new Vector2(body.linearVelocity.x, speed);
+        ResetJumpState();
+    }
+
+    public void RespawnAt(Vector3 position)
+    {
+        transform.position = position;
+        body.position = position;
+        body.linearVelocity = Vector2.zero;
+        body.angularVelocity = 0f;
+        horizontalInput = 0f;
+        ResetJumpState();
+        Physics2D.SyncTransforms();
+        PreviousFootPosition = FootPosition;
+    }
+
+    private void ResetJumpState()
+    {
+        jumpRequested = false;
+        IsGrounded = false;
+        jumpAvailable = false;
+        coyoteUntil = double.NegativeInfinity;
     }
 
     private void RequestJump(InputAction.CallbackContext context)
