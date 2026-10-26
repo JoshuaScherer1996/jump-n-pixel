@@ -1,0 +1,11 @@
+Jump 'n' Pixel - Asset Credits
+
+Kenney
+1-Bit Platformer Pack
+https://kenney.nl/assets/1-bit-platformer-pack
+License: CC0 1.0
+
+Luis Zuno (ansimuz)
+Caverns Environment
+https://ansimuz.itch.io/caverns-environment
+License: CC0 1.0
