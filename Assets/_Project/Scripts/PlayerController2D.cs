@@ -18,6 +18,7 @@ public sealed class PlayerController2D : MonoBehaviour
     private readonly RaycastHit2D[] groundHits = new RaycastHit2D[8];
     private Rigidbody2D body;
     private CapsuleCollider2D bodyCollider;
+    private MovingPlatform2D supportingPlatform;
     private ContactFilter2D groundFilter;
     private InputActionAsset runtimeActions;
     private InputAction moveAction;
@@ -107,6 +108,8 @@ public sealed class PlayerController2D : MonoBehaviour
         }
         var velocity = body.linearVelocity;
         var isKnockedBack = Time.fixedTimeAsDouble < knockbackUntil;
+        if (IsGrounded && supportingPlatform != null && !isKnockedBack)
+            velocity.y = supportingPlatform.Velocity.y;
         if (!isKnockedBack)
         {
             var targetSpeed = horizontalInput * movementSpeed;
@@ -164,6 +167,7 @@ public sealed class PlayerController2D : MonoBehaviour
         IsGrounded = false;
         jumpAvailable = false;
         coyoteUntil = double.NegativeInfinity;
+        supportingPlatform = null;
     }
 
     public void SetGameplayPaused(bool paused)
@@ -181,17 +185,25 @@ public sealed class PlayerController2D : MonoBehaviour
 
     private bool CheckGrounded()
     {
-        if (body.linearVelocity.y > 0.1f)
-            return false;
-
+        var previousPlatform = supportingPlatform;
+        supportingPlatform = null;
         var count = bodyCollider.Cast(Vector2.down, groundFilter, groundHits, groundCheckDistance);
         var footHeight = bodyCollider.bounds.min.y + groundCheckDistance;
 
         for (var i = 0; i < count; i++)
         {
             var hit = groundHits[i];
-            if (hit.normal.y >= 0.7f && hit.point.y <= footHeight)
-                return true;
+            if (hit.normal.y < 0.7f || hit.point.y > footHeight)
+                continue;
+
+            var platform = hit.rigidbody != null ? hit.rigidbody.GetComponent<MovingPlatform2D>() : null;
+            var supportVelocity = platform != null ? platform.Velocity.y : 0f;
+            if (body.linearVelocity.y - supportVelocity > 0.1f
+                && !(IsGrounded && platform != null && platform == previousPlatform))
+                continue;
+
+            supportingPlatform = platform;
+            return true;
         }
 
         return false;

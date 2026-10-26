@@ -62,18 +62,19 @@ public sealed class PlayerCameraFollow2D : MonoBehaviour
 
         var halfHeight = followingCamera.orthographicSize;
         var halfWidth = followingCamera.orthographicSize * followingCamera.aspect;
+        var pixelsPerUnit = Mathf.Max(1f, followingCamera.pixelHeight / (halfHeight * 2f));
         var desiredHeight = target.position.y + verticalOffset;
         transform.position = new Vector3(
-            ConstrainAxis(target.position.x, levelBounds.min.x, levelBounds.max.x, halfWidth),
-            ConstrainAxis(desiredHeight, levelBounds.min.y, levelBounds.max.y, halfHeight),
+            ConstrainAxis(target.position.x, levelBounds.min.x, levelBounds.max.x, halfWidth, pixelsPerUnit),
+            ConstrainAxis(desiredHeight, levelBounds.min.y, levelBounds.max.y, halfHeight, pixelsPerUnit),
             fixedDepth);
     }
 
-    private float ConstrainAxis(float position, float lowerBound, float upperBound, float halfExtent)
+    private float ConstrainAxis(float position, float lowerBound, float upperBound, float halfExtent, float pixelsPerUnit)
     {
-        var pixelsPerUnit = pixelPerfectCamera.assetsPPU;
-        var minimum = Mathf.Ceil((lowerBound + halfExtent) * pixelsPerUnit) / pixelsPerUnit;
-        var maximum = Mathf.Floor((upperBound - halfExtent) * pixelsPerUnit) / pixelsPerUnit;
+        var assetPixelsPerUnit = pixelPerfectCamera.assetsPPU;
+        var minimum = Mathf.Ceil((lowerBound + halfExtent) * assetPixelsPerUnit) / assetPixelsPerUnit;
+        var maximum = Mathf.Floor((upperBound - halfExtent) * assetPixelsPerUnit) / assetPixelsPerUnit;
         return minimum <= maximum
             ? Mathf.Clamp(Mathf.Round(position * pixelsPerUnit) / pixelsPerUnit, minimum, maximum)
             : (lowerBound + upperBound) * 0.5f;
