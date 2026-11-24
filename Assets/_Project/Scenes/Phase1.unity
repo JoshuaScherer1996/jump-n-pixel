@@ -6112,8 +6112,8 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::ParallaxLayer2D
   viewCamera: {fileID: 519420031}
-  horizontalScrollFactor: 0.18
-  alternateFlipX: 0
+  horizontalScrollFactor: 0.35
+  alternateFlipX: 1
   tiles:
   - {fileID: 653015476}
   - {fileID: 1838524894}
@@ -22239,7 +22239,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::ParallaxLayer2D
   viewCamera: {fileID: 519420031}
-  horizontalScrollFactor: 0.08
+  horizontalScrollFactor: 0.15
   alternateFlipX: 0
   tiles:
   - {fileID: 1049501425}
