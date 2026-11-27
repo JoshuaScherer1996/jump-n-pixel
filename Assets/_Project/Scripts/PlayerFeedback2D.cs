@@ -27,6 +27,9 @@ public sealed class PlayerFeedback2D : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (Time.timeScale == 0f)
+            return;
+
         var isInvulnerable = health.IsInvulnerable;
         if (isInvulnerable && !wasInvulnerable)
             pulseStartedAt = Time.time;

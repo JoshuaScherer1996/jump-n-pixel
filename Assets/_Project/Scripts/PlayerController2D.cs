@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Rigidbody2D), typeof(CapsuleCollider2D))]
@@ -30,6 +31,9 @@ public sealed class PlayerController2D : MonoBehaviour
     private bool jumpRequested;
     private bool jumpAvailable;
     private bool gameplayPaused;
+    private bool menuInputSuspended;
+    private bool restoreMoveAction;
+    private bool restoreJumpAction;
     private double coyoteUntil = double.NegativeInfinity;
     private double knockbackUntil = double.NegativeInfinity;
     private bool airborneForLanding;
@@ -65,8 +69,14 @@ public sealed class PlayerController2D : MonoBehaviour
         jumpAvailable = false;
         coyoteUntil = double.NegativeInfinity;
         jumpAction.performed += RequestJump;
-        moveAction.Enable();
-        jumpAction.Enable();
+        if (!menuInputSuspended)
+        {
+            moveAction.Enable();
+            if (restoreJumpAction)
+                RestoreJumpWhenReleased();
+            else
+                jumpAction.Enable();
+        }
     }
 
     private void OnDisable()
@@ -92,8 +102,11 @@ public sealed class PlayerController2D : MonoBehaviour
 
     private void Update()
     {
-        if (gameplayPaused)
+        if (gameplayPaused || menuInputSuspended)
             return;
+
+        if (restoreJumpAction)
+            RestoreJumpWhenReleased();
 
         horizontalInput = Mathf.Clamp(moveAction.ReadValue<Vector2>().x, -1f, 1f);
     }
@@ -194,9 +207,48 @@ public sealed class PlayerController2D : MonoBehaviour
         ResetJumpState();
     }
 
+    public void SetMenuInputSuspended(bool suspended)
+    {
+        if (menuInputSuspended == suspended)
+            return;
+
+        menuInputSuspended = suspended;
+        jumpRequested = false;
+        horizontalInput = 0f;
+        if (suspended)
+        {
+            restoreMoveAction = moveAction.enabled;
+            restoreJumpAction |= jumpAction.enabled;
+            moveAction.Disable();
+            jumpAction.Disable();
+        }
+        else if (isActiveAndEnabled)
+        {
+            if (restoreMoveAction)
+                moveAction.Enable();
+            if (restoreJumpAction)
+                RestoreJumpWhenReleased();
+        }
+    }
+
+    private void RestoreJumpWhenReleased()
+    {
+        foreach (var control in jumpAction.controls)
+        {
+            if (control is ButtonControl button && button.isPressed)
+            {
+                restoreJumpAction = true;
+                return;
+            }
+        }
+
+        restoreJumpAction = false;
+        jumpAction.Enable();
+    }
+
     private void RequestJump(InputAction.CallbackContext context)
     {
-        if (!gameplayPaused)
+        if (!gameplayPaused && !menuInputSuspended)
             jumpRequested = true;
     }
 

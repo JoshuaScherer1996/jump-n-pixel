@@ -27,6 +27,9 @@ public sealed class PlayerAnimation2D : MonoBehaviour
 
     private void Update()
     {
+        if (Time.timeScale == 0f)
+            return;
+
         var velocity = controller.Velocity;
         if (Mathf.Abs(velocity.x) > 0.05f)
             spriteRenderer.flipX = velocity.x < 0f;

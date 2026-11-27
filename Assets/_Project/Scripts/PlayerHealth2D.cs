@@ -42,7 +42,8 @@ public sealed class PlayerHealth2D : MonoBehaviour
 
     private bool TryApplyDamage(int damage, Vector2 knockback, bool bypassInvulnerability)
     {
-        if (!isActiveAndEnabled || damage <= 0 || (!bypassInvulnerability && IsInvulnerable) || CurrentHealth <= 0)
+        if (Time.timeScale == 0f || !isActiveAndEnabled || damage <= 0
+            || (!bypassInvulnerability && IsInvulnerable) || CurrentHealth <= 0)
             return false;
 
         var hitPosition = transform.position;

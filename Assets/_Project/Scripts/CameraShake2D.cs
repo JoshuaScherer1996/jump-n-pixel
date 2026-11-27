@@ -15,6 +15,7 @@ public sealed class CameraShake2D : MonoBehaviour
     private Camera viewCamera;
     private PixelPerfectCamera pixelPerfectCamera;
     private double startedAt;
+    private double? pausedAt;
     private float duration;
     private bool offsetApplied;
 
@@ -50,6 +51,19 @@ public sealed class CameraShake2D : MonoBehaviour
     private void OnDamage(Vector3 position) => BeginShake(damageDuration);
     private void OnShieldBreak(Vector3 position) => BeginShake(shieldBreakDuration);
 
+    internal void SetMenuPaused(bool paused)
+    {
+        if (paused)
+        {
+            pausedAt ??= Time.unscaledTimeAsDouble;
+        }
+        else if (pausedAt.HasValue)
+        {
+            startedAt += Time.unscaledTimeAsDouble - pausedAt.Value;
+            pausedAt = null;
+        }
+    }
+
     private void BeginShake(float seconds)
     {
         if (!shakeEnabled)
@@ -64,7 +78,7 @@ public sealed class CameraShake2D : MonoBehaviour
         if (!isActiveAndEnabled || !shakeEnabled || duration <= 0f)
             return;
 
-        var progress = (float)((Time.unscaledTimeAsDouble - startedAt) / duration);
+        var progress = (float)(((pausedAt ?? Time.unscaledTimeAsDouble) - startedAt) / duration);
         if (progress >= 1f)
         {
             ClearShake();

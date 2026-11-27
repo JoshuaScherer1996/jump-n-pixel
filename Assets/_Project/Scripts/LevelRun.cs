@@ -60,6 +60,9 @@ public sealed class LevelRun : MonoBehaviour
 
     private void Update()
     {
+        if (Time.timeScale == 0f)
+            return;
+
         if (IsExpired)
         {
             if (!IsJumpHeld())
@@ -108,7 +111,7 @@ public sealed class LevelRun : MonoBehaviour
 
     private void OnJump(InputAction.CallbackContext context)
     {
-        if (!IsExpired || !restartArmed || isRestarting || Time.frameCount <= expiredFrame)
+        if (Time.timeScale == 0f || !IsExpired || !restartArmed || isRestarting || Time.frameCount <= expiredFrame)
             return;
 
         isRestarting = true;

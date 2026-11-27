@@ -52,6 +52,9 @@ public sealed class ParallaxTilemapLayer2D : MonoBehaviour
 
     private void PositionLayer()
     {
+        if (Time.timeScale == 0f)
+            return;
+
         var cameraX = viewCamera.transform.position.x;
         var cameraDelta = cameraX - initialCameraX;
         var desiredX = initialLayerX + cameraDelta * (1f - Mathf.Clamp01(horizontalScrollFactor));

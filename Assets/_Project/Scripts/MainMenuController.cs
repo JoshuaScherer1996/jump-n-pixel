@@ -25,6 +25,11 @@ public sealed class MainMenuController : MonoBehaviour
     private Button returnSelection;
     private bool transitioning;
 
+    private void Awake()
+    {
+        Time.timeScale = 1f;
+    }
+
     private void Start()
     {
         fadeOverlay.alpha = 0f;
@@ -99,17 +104,7 @@ public sealed class MainMenuController : MonoBehaviour
 
     private IEnumerator FadeAndLoad()
     {
-        double start = Time.unscaledTimeAsDouble;
-        while (Time.unscaledTimeAsDouble - start < fadeDuration)
-        {
-            float t = Mathf.Clamp01((float)((Time.unscaledTimeAsDouble - start) / fadeDuration));
-            fadeOverlay.alpha = t * t * (3f - 2f * t);
-            yield return null;
-        }
-
-        fadeOverlay.alpha = 1f;
-        // Present the fully black overlay before starting the single-scene load.
-        yield return null;
+        yield return MenuFade.ToBlack(fadeOverlay, fadeDuration);
         yield return SceneManager.LoadSceneAsync(gameplayScenePath, LoadSceneMode.Single);
     }
 }

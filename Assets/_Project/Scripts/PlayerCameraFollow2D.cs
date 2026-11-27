@@ -61,7 +61,7 @@ public sealed class PlayerCameraFollow2D : MonoBehaviour
 
     private void FollowTarget()
     {
-        if (target == null || !hasLevelBounds)
+        if (Time.timeScale == 0f || target == null || !hasLevelBounds)
             return;
 
         var halfHeight = followingCamera.orthographicSize;

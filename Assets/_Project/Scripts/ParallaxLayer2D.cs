@@ -65,7 +65,7 @@ public sealed class ParallaxLayer2D : MonoBehaviour
 
     private void PositionTiles()
     {
-        if (!initialized)
+        if (Time.timeScale == 0f || !initialized)
             return;
 
         var halfWidth = viewCamera.orthographicSize * viewCamera.aspect;
