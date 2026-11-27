@@ -19,6 +19,9 @@ public sealed class PlayerHealth2D : MonoBehaviour
     public event Action<int, int> HealthChanged;
     public event Action<bool> ShieldChanged;
     public event Action Respawned;
+    public event Action<Vector3> Damaged;
+    public event Action<Vector3> ShieldBroken;
+    public event Action<Vector3> Died;
 
     private void Awake()
     {
@@ -42,11 +45,13 @@ public sealed class PlayerHealth2D : MonoBehaviour
         if (!isActiveAndEnabled || damage <= 0 || (!bypassInvulnerability && IsInvulnerable) || CurrentHealth <= 0)
             return false;
 
+        var hitPosition = transform.position;
         invulnerableUntil = Time.timeAsDouble + invulnerabilityTime;
         if (HasShield)
         {
             controller.ApplyKnockback(knockback);
             SetShield(false);
+            ShieldBroken?.Invoke(hitPosition);
             return true;
         }
 
@@ -55,7 +60,14 @@ public sealed class PlayerHealth2D : MonoBehaviour
             controller.ApplyKnockback(knockback);
         HealthChanged?.Invoke(CurrentHealth, MaximumHealth);
         if (CurrentHealth == 0)
+        {
+            Died?.Invoke(hitPosition);
             Respawn();
+        }
+        else
+        {
+            Damaged?.Invoke(hitPosition);
+        }
 
         return true;
     }

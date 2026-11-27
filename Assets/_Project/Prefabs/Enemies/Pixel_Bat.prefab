@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4758546859141579892}
   - component: {fileID: 6990960950854655656}
   - component: {fileID: 8541997015943133640}
+  - component: {fileID: 2067652939325549373}
   m_Layer: 0
   m_Name: Pixel_Bat
   m_TagString: Untagged
@@ -182,3 +183,16 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2067652939325549373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8769152787866624068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dc769975a8496a449b51d8c9c3105cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WorldBurstVFX2D
+  burst: {fileID: 8574483331551847588, guid: 81ee28f31f1016d41bc6f66dbf3d4bd9, type: 3}

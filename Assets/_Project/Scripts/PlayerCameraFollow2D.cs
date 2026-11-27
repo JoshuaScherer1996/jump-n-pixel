@@ -14,6 +14,7 @@ public sealed class PlayerCameraFollow2D : MonoBehaviour
 
     private Camera followingCamera;
     private PixelPerfectCamera pixelPerfectCamera;
+    private CameraShake2D cameraShake;
     private float fixedDepth;
     private Bounds levelBounds;
     private bool hasLevelBounds;
@@ -22,6 +23,7 @@ public sealed class PlayerCameraFollow2D : MonoBehaviour
     {
         followingCamera = GetComponent<Camera>();
         pixelPerfectCamera = GetComponent<PixelPerfectCamera>();
+        cameraShake = GetComponent<CameraShake2D>();
         fixedDepth = transform.position.z;
         FindLevelBounds();
     }
@@ -53,6 +55,8 @@ public sealed class PlayerCameraFollow2D : MonoBehaviour
 
         FollowTarget();
         followingCamera.ResetWorldToCameraMatrix();
+        if (hasLevelBounds && cameraShake != null)
+            cameraShake.ApplyRenderOffset(levelBounds);
     }
 
     private void FollowTarget()

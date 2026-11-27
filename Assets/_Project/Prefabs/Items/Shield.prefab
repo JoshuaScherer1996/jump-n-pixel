@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2217206184202421126}
   - component: {fileID: 7345769140723704005}
   - component: {fileID: 8323258769459559222}
+  - component: {fileID: 5812011570898754022}
   m_Layer: 0
   m_Name: Shield
   m_TagString: Untagged
@@ -154,3 +155,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Collectible2D
   points: 0
   grantsShield: 1
+--- !u!114 &5812011570898754022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8115327780829869790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dc769975a8496a449b51d8c9c3105cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WorldBurstVFX2D
+  burst: {fileID: 588783854110869399, guid: bf7e77cfa16aad74e89373e61c8234e5, type: 3}

@@ -143,6 +143,7 @@ GameObject:
   - component: {fileID: 8810115976562485422}
   - component: {fileID: 562027971600912871}
   - component: {fileID: 6271616288557447619}
+  - component: {fileID: 6637001981769855556}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -253,6 +254,7 @@ MonoBehaviour:
     m_Bits: 256
   groundCheckDistance: 0.06
   knockbackDuration: 0.15
+  landingDustMinSpeed: 2
 --- !u!114 &562027971600912871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,3 +284,20 @@ MonoBehaviour:
   minimumAlpha: 0.45
   pulseFrequency: 5
   shieldTint: {r: 0.65, g: 1, b: 0.65, a: 1}
+--- !u!114 &6637001981769855556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6699400113049494944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b20d597b548bccc449ad48e8304b7b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameplayVFX2D
+  jumpDust: {fileID: 4235447584158064442, guid: 29c8475063571974ba94cf58dbe9c4ca, type: 3}
+  landingDust: {fileID: 7650444131777733204, guid: 302b6b4a251eae24183cd306e8ffc16a, type: 3}
+  damage: {fileID: 1732950254133927706, guid: f3bdcdc545e006a48a472a605af4fb72, type: 3}
+  shieldBreak: {fileID: 219053827655980784, guid: 9a6d3e282bd5fe04dad3ac2449ff39c5, type: 3}
+  playerDeath: {fileID: 1473677368354642436, guid: dc9572301f17fdf4990c6dde92f66689, type: 3}

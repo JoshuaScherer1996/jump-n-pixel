@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 122026834082782590}
   - component: {fileID: 3161212034163558563}
   - component: {fileID: 7829249404992975602}
+  - component: {fileID: 6926997036494490781}
   m_Layer: 0
   m_Name: Big_Coin
   m_TagString: Untagged
@@ -154,3 +155,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Collectible2D
   points: 50
   grantsShield: 0
+--- !u!114 &6926997036494490781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4811325220364630178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dc769975a8496a449b51d8c9c3105cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WorldBurstVFX2D
+  burst: {fileID: 1165050392649895809, guid: f83116b911b6aca4481f5b020a7a78fb, type: 3}

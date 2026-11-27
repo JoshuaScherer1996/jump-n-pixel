@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,8 +15,10 @@ public sealed class PlayerController2D : MonoBehaviour
     [SerializeField] private LayerMask groundLayers;
     [SerializeField, Min(0.001f)] private float groundCheckDistance = 0.06f;
     [SerializeField, Min(0f)] private float knockbackDuration = 0.15f;
+    [SerializeField, Min(0.1f)] private float landingDustMinSpeed = 2f;
 
     private readonly RaycastHit2D[] groundHits = new RaycastHit2D[8];
+    private readonly ContactPoint2D[] landingContacts = new ContactPoint2D[8];
     private Rigidbody2D body;
     private CapsuleCollider2D bodyCollider;
     private MovingPlatform2D supportingPlatform;
@@ -29,6 +32,8 @@ public sealed class PlayerController2D : MonoBehaviour
     private bool gameplayPaused;
     private double coyoteUntil = double.NegativeInfinity;
     private double knockbackUntil = double.NegativeInfinity;
+    private bool airborneForLanding;
+    private float landingDescentSpeed;
 
     public Vector2 Velocity => body.linearVelocity;
     public InputAction JumpAction => jumpAction;
@@ -37,6 +42,8 @@ public sealed class PlayerController2D : MonoBehaviour
     public bool IsGrounded { get; private set; }
     public Vector2 PreviousFootPosition { get; private set; }
     public Vector2 FootPosition => new Vector2(bodyCollider.bounds.center.x, bodyCollider.bounds.min.y);
+    public event Action<Vector2> GroundJumped;
+    public event Action<Vector2> Landed;
 
     private void Awake()
     {
@@ -73,6 +80,7 @@ public sealed class PlayerController2D : MonoBehaviour
         IsGrounded = false;
         jumpAvailable = false;
         coyoteUntil = double.NegativeInfinity;
+        airborneForLanding = false;
         body.linearVelocity = new Vector2(0f, body.linearVelocity.y);
     }
 
@@ -97,7 +105,7 @@ public sealed class PlayerController2D : MonoBehaviour
 
         PreviousFootPosition = FootPosition;
         var wasGrounded = IsGrounded;
-        IsGrounded = CheckGrounded();
+        IsGrounded = CheckGrounded(out var ground);
         if (IsGrounded)
         {
             jumpAvailable = true;
@@ -107,6 +115,8 @@ public sealed class PlayerController2D : MonoBehaviour
             coyoteUntil = Time.fixedTimeAsDouble + coyoteTime;
         }
         var velocity = body.linearVelocity;
+        var landed = ObserveLanding(ground, velocity.y);
+        var jumpedFromGround = false;
         var isKnockedBack = Time.fixedTimeAsDouble < knockbackUntil;
         if (IsGrounded && supportingPlatform != null && !isKnockedBack)
             velocity.y = supportingPlatform.Velocity.y;
@@ -119,6 +129,7 @@ public sealed class PlayerController2D : MonoBehaviour
 
         if (!isKnockedBack && jumpRequested && jumpAvailable && (IsGrounded || Time.fixedTimeAsDouble < coyoteUntil))
         {
+            jumpedFromGround = IsGrounded;
             velocity.y = jumpSpeed;
             IsGrounded = false;
             jumpAvailable = false;
@@ -128,6 +139,11 @@ public sealed class PlayerController2D : MonoBehaviour
         jumpRequested = false;
         body.linearVelocity = velocity;
         PrePhysicsVelocity = velocity;
+
+        if (landed)
+            Landed?.Invoke(PreviousFootPosition);
+        if (jumpedFromGround)
+            GroundJumped?.Invoke(PreviousFootPosition);
     }
 
     public void Bounce()
@@ -168,6 +184,7 @@ public sealed class PlayerController2D : MonoBehaviour
         jumpAvailable = false;
         coyoteUntil = double.NegativeInfinity;
         supportingPlatform = null;
+        airborneForLanding = false;
     }
 
     public void SetGameplayPaused(bool paused)
@@ -183,8 +200,40 @@ public sealed class PlayerController2D : MonoBehaviour
             jumpRequested = true;
     }
 
-    private bool CheckGrounded()
+    private bool ObserveLanding(Collider2D ground, float verticalSpeed)
     {
+        if (ground == null)
+        {
+            airborneForLanding = true;
+            landingDescentSpeed = 0f;
+            return false;
+        }
+
+        if (!airborneForLanding)
+            return false;
+
+        // Keep the approach speed while the ground probe is near the platform. The
+        // solver or platform follow may have already changed the current velocity.
+        var supportSpeed = supportingPlatform != null ? supportingPlatform.Velocity.y : 0f;
+        var descentSpeed = supportSpeed - Mathf.Min(verticalSpeed, PrePhysicsVelocity.y);
+        landingDescentSpeed = Mathf.Max(landingDescentSpeed, descentSpeed);
+        var count = bodyCollider.GetContacts(groundFilter, landingContacts);
+        for (var i = 0; i < count; i++)
+        {
+            var contact = landingContacts[i];
+            if (contact.collider != ground || contact.normal.y < 0.7f)
+                continue;
+
+            airborneForLanding = false;
+            return landingDescentSpeed >= landingDustMinSpeed;
+        }
+
+        return false;
+    }
+
+    private bool CheckGrounded(out Collider2D ground)
+    {
+        ground = null;
         var previousPlatform = supportingPlatform;
         supportingPlatform = null;
         var count = bodyCollider.Cast(Vector2.down, groundFilter, groundHits, groundCheckDistance);
@@ -203,6 +252,7 @@ public sealed class PlayerController2D : MonoBehaviour
                 continue;
 
             supportingPlatform = platform;
+            ground = hit.collider;
             return true;
         }
 

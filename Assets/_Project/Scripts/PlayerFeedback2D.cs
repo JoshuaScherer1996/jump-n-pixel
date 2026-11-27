@@ -14,6 +14,8 @@ public sealed class PlayerFeedback2D : MonoBehaviour
     private bool wasInvulnerable;
     private float pulseStartedAt;
 
+    public Color ShieldTint => shieldTint;
+
     private void Awake()
     {
         health = GetComponent<PlayerHealth2D>();

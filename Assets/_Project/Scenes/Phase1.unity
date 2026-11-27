@@ -124188,6 +124188,7 @@ GameObject:
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
   - component: {fileID: 519420034}
+  - component: {fileID: 519420035}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -124354,6 +124355,23 @@ MonoBehaviour:
   - {fileID: 1030453938}
   - {fileID: 1496299082}
   verticalOffset: 0
+--- !u!114 &519420035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 266ac967b39913a47869fb8d3dd7066b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraShake2D
+  player: {fileID: 1828018830}
+  shakeEnabled: 1
+  amplitudePixels: 1
+  damageDuration: 0.1
+  shieldBreakDuration: 0.1
 --- !u!1001 &530057581
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -127275,7 +127293,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b996ab25f72a0ec4b8dae4c9e0c64fe2, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParallaxLayer2D
   viewCamera: {fileID: 519420031}
   horizontalScrollFactor: 0.35
@@ -143402,7 +143420,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b996ab25f72a0ec4b8dae4c9e0c64fe2, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParallaxLayer2D
   viewCamera: {fileID: 519420031}
   horizontalScrollFactor: 0.15
