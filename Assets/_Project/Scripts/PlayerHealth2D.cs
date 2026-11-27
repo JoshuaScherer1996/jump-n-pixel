@@ -53,18 +53,27 @@ public sealed class PlayerHealth2D : MonoBehaviour
             return true;
         }
 
-        CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
-        if (CurrentHealth == 0)
+        if (damage >= CurrentHealth)
         {
-            Died?.Invoke(hitPosition);
-            HealthChanged?.Invoke(CurrentHealth, MaximumHealth);
+            Die();
             return true;
         }
 
+        CurrentHealth -= damage;
         controller.ApplyKnockback(knockback);
         HealthChanged?.Invoke(CurrentHealth, MaximumHealth);
         Damaged?.Invoke(hitPosition);
         return true;
+    }
+
+    internal void Die()
+    {
+        if (CurrentHealth == 0)
+            return;
+
+        CurrentHealth = 0;
+        Died?.Invoke(transform.position);
+        HealthChanged?.Invoke(CurrentHealth, MaximumHealth);
     }
 
     public void GrantShield()

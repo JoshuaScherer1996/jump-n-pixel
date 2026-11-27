@@ -13,7 +13,6 @@ public sealed class GameplayHud : MonoBehaviour
     [SerializeField] private TMP_Text timeText;
     [SerializeField] private RectTransform heartsRoot;
     [SerializeField] private UnityEngine.UI.Image heartTemplate;
-    [SerializeField] private GameObject timeoutMessage;
     [SerializeField] private UnityEngine.UI.CanvasScaler canvasScaler;
     [SerializeField] private Color shieldColor = new Color(0.65f, 1f, 0.65f, 1f);
     [SerializeField] private Color lowTimeColor = new Color(1f, 0.8f, 0.55f, 1f);
@@ -31,7 +30,6 @@ public sealed class GameplayHud : MonoBehaviour
     {
         levelScore.ScoreChanged += UpdateScore;
         levelRun.TimeChanged += UpdateTime;
-        levelRun.Expired += ShowTimeout;
         playerHealth.HealthChanged += UpdateHealth;
         playerHealth.ShieldChanged += UpdateShield;
         Refresh();
@@ -41,7 +39,6 @@ public sealed class GameplayHud : MonoBehaviour
     {
         levelScore.ScoreChanged -= UpdateScore;
         levelRun.TimeChanged -= UpdateTime;
-        levelRun.Expired -= ShowTimeout;
         playerHealth.HealthChanged -= UpdateHealth;
         playerHealth.ShieldChanged -= UpdateShield;
     }
@@ -57,7 +54,6 @@ public sealed class GameplayHud : MonoBehaviour
         UpdateScore(levelScore.Score);
         UpdateTime(levelRun.DisplayedSeconds);
         UpdateHealth(playerHealth.CurrentHealth, playerHealth.MaximumHealth);
-        timeoutMessage.SetActive(levelRun.IsExpired);
         UpdateScale();
     }
 
@@ -99,10 +95,5 @@ public sealed class GameplayHud : MonoBehaviour
     {
         foreach (var heart in hearts)
             heart.color = active ? shieldColor : Color.white;
-    }
-
-    private void ShowTimeout()
-    {
-        timeoutMessage.SetActive(true);
     }
 }

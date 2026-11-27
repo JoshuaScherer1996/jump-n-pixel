@@ -5,7 +5,6 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class LevelScore : MonoBehaviour
 {
-    [SerializeField] private LevelRun levelRun;
     [SerializeField] private PlayerHealth2D player;
 
     private readonly HashSet<UnityEngine.Object> awardedSources = new HashSet<UnityEngine.Object>();
@@ -49,7 +48,7 @@ public sealed class LevelScore : MonoBehaviour
 
     private void Award(UnityEngine.Object source, PlayerHealth2D recipient, int points)
     {
-        if (levelRun.IsExpired || recipient != player || !player.isActiveAndEnabled || player.CurrentHealth == 0
+        if (recipient != player || !player.isActiveAndEnabled || player.CurrentHealth == 0
             || points <= 0 || !awardedSources.Add(source))
             return;
 
