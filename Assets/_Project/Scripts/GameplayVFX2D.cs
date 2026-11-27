@@ -28,7 +28,6 @@ public sealed class GameplayVFX2D : MonoBehaviour
         controller.Landed += PlayLanding;
         health.Damaged += PlayDamage;
         health.ShieldBroken += PlayShieldBreak;
-        health.Died += PlayDeath;
     }
 
     private void OnDisable()
@@ -37,7 +36,6 @@ public sealed class GameplayVFX2D : MonoBehaviour
         controller.Landed -= PlayLanding;
         health.Damaged -= PlayDamage;
         health.ShieldBroken -= PlayShieldBreak;
-        health.Died -= PlayDeath;
     }
 
     private Vector3 AtFeet(Vector2 position) => new Vector3(position.x, position.y, transform.position.z);
@@ -45,22 +43,55 @@ public sealed class GameplayVFX2D : MonoBehaviour
     private void PlayLanding(Vector2 position) => Spawn(landingDust, AtFeet(position), gameObject.scene);
     private void PlayDamage(Vector3 position) => Spawn(damage, position, gameObject.scene);
     private void PlayShieldBreak(Vector3 position) => Spawn(shieldBreak, position, gameObject.scene, feedback.ShieldTint);
-    private void PlayDeath(Vector3 position) => Spawn(playerDeath, position, gameObject.scene);
+
+    internal ParticleSystem PlayDeath(Vector3 position)
+    {
+        if (playerDeath == null || !playerDeath.gameObject.activeSelf)
+        {
+            Debug.LogError("The player death burst needs an active particle prefab.", this);
+            return null;
+        }
+
+        var burst = CreateBurst(playerDeath, position, gameObject.scene);
+        foreach (var system in burst.GetComponentsInChildren<ParticleSystem>(true))
+        {
+            var main = system.main;
+            if (main.loop || main.simulationSpeed <= 0f || main.ringBufferMode != ParticleSystemRingBufferMode.Disabled)
+            {
+                Debug.LogError("The player death burst needs finite particle systems that can finish playing.", this);
+                Destroy(burst.gameObject);
+                return null;
+            }
+
+            main.useUnscaledTime = true;
+            main.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
+            // Keep the hierarchy alive until every child and sub-emitter has finished.
+            main.stopAction = ParticleSystemStopAction.None;
+        }
+
+        burst.Play();
+        return burst;
+    }
 
     internal static void Spawn(ParticleSystem prefab, Vector3 position, Scene scene, Color? tint = null)
     {
         if (prefab == null)
             return;
 
-        // The source can deactivate or teleport during the gameplay event.
-        var burst = Instantiate(prefab, position, Quaternion.identity);
-        if (burst.gameObject.scene != scene)
-            SceneManager.MoveGameObjectToScene(burst.gameObject, scene);
+        var burst = CreateBurst(prefab, position, scene);
         if (tint.HasValue)
         {
             var main = burst.main;
             main.startColor = tint.Value;
         }
         burst.Play();
+    }
+
+    private static ParticleSystem CreateBurst(ParticleSystem prefab, Vector3 position, Scene scene)
+    {
+        var burst = Instantiate(prefab, position, Quaternion.identity);
+        if (burst.gameObject.scene != scene)
+            SceneManager.MoveGameObjectToScene(burst.gameObject, scene);
+        return burst;
     }
 }

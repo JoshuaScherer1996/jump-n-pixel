@@ -51,7 +51,7 @@ public sealed class EnemyInteraction2D : MonoBehaviour
 
     private void Update()
     {
-        if (IsDefeated)
+        if (Time.timeScale == 0f || IsDefeated)
             return;
 
         foreach (var contact in contacts)
@@ -66,9 +66,9 @@ public sealed class EnemyInteraction2D : MonoBehaviour
     private void Interact(Collision2D collision)
     {
         var other = collision.collider;
-        if (IsDefeated || resolvedContacts.Contains(other) || other.attachedRigidbody == null
+        if (Time.timeScale == 0f || IsDefeated || resolvedContacts.Contains(other) || other.attachedRigidbody == null
             || !other.attachedRigidbody.TryGetComponent<PlayerHealth2D>(out var player)
-            || !player.isActiveAndEnabled)
+            || !player.isActiveAndEnabled || player.CurrentHealth == 0)
             return;
 
         var controller = player.GetComponent<PlayerController2D>();

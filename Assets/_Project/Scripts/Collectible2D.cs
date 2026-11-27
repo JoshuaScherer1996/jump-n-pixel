@@ -25,9 +25,9 @@ public sealed class Collectible2D : MonoBehaviour
 
     private void TryCollect(Collider2D other)
     {
-        if (IsCollected || other.attachedRigidbody == null
+        if (Time.timeScale == 0f || IsCollected || other.attachedRigidbody == null
             || !other.attachedRigidbody.TryGetComponent<PlayerHealth2D>(out var player)
-            || !player.isActiveAndEnabled)
+            || !player.isActiveAndEnabled || player.CurrentHealth == 0)
             return;
 
         IsCollected = true;

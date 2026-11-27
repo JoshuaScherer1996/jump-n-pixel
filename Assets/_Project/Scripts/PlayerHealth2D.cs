@@ -9,7 +9,6 @@ public sealed class PlayerHealth2D : MonoBehaviour
     [SerializeField, Min(0.01f)] private float invulnerabilityTime = 0.75f;
 
     private PlayerController2D controller;
-    private Vector3 spawnPosition;
     private double invulnerableUntil = double.NegativeInfinity;
 
     public int MaximumHealth => maximumHealth;
@@ -18,7 +17,6 @@ public sealed class PlayerHealth2D : MonoBehaviour
     public bool IsInvulnerable => Time.timeAsDouble < invulnerableUntil;
     public event Action<int, int> HealthChanged;
     public event Action<bool> ShieldChanged;
-    public event Action Respawned;
     public event Action<Vector3> Damaged;
     public event Action<Vector3> ShieldBroken;
     public event Action<Vector3> Died;
@@ -26,7 +24,6 @@ public sealed class PlayerHealth2D : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<PlayerController2D>();
-        spawnPosition = transform.position;
         CurrentHealth = maximumHealth;
     }
 
@@ -57,35 +54,23 @@ public sealed class PlayerHealth2D : MonoBehaviour
         }
 
         CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
-        if (CurrentHealth > 0)
-            controller.ApplyKnockback(knockback);
-        HealthChanged?.Invoke(CurrentHealth, MaximumHealth);
         if (CurrentHealth == 0)
         {
             Died?.Invoke(hitPosition);
-            Respawn();
-        }
-        else
-        {
-            Damaged?.Invoke(hitPosition);
+            HealthChanged?.Invoke(CurrentHealth, MaximumHealth);
+            return true;
         }
 
+        controller.ApplyKnockback(knockback);
+        HealthChanged?.Invoke(CurrentHealth, MaximumHealth);
+        Damaged?.Invoke(hitPosition);
         return true;
     }
 
     public void GrantShield()
     {
-        SetShield(true);
-    }
-
-    private void Respawn()
-    {
-        invulnerableUntil = double.NegativeInfinity;
-        SetShield(false);
-        controller.RespawnAt(spawnPosition);
-        CurrentHealth = MaximumHealth;
-        HealthChanged?.Invoke(CurrentHealth, MaximumHealth);
-        Respawned?.Invoke();
+        if (CurrentHealth > 0)
+            SetShield(true);
     }
 
     private void SetShield(bool active)

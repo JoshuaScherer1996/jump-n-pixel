@@ -49,7 +49,7 @@ public sealed class LevelScore : MonoBehaviour
 
     private void Award(UnityEngine.Object source, PlayerHealth2D recipient, int points)
     {
-        if (levelRun.IsExpired || recipient != player || !player.isActiveAndEnabled
+        if (levelRun.IsExpired || recipient != player || !player.isActiveAndEnabled || player.CurrentHealth == 0
             || points <= 0 || !awardedSources.Add(source))
             return;
 

@@ -48,14 +48,15 @@ public sealed class PlayerFeedback2D : MonoBehaviour
         wasInvulnerable = isInvulnerable;
     }
 
-    private void OnEnable()
+    internal void HidePlayer()
     {
-        health.Respawned += ResetFeedback;
+        foreach (var spriteRenderer in spriteRenderers)
+            if (spriteRenderer != null)
+                spriteRenderer.enabled = false;
     }
 
     private void OnDisable()
     {
-        health.Respawned -= ResetFeedback;
         ResetFeedback();
     }
 

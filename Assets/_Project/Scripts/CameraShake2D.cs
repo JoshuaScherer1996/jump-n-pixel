@@ -31,7 +31,6 @@ public sealed class CameraShake2D : MonoBehaviour
         {
             player.Damaged += OnDamage;
             player.ShieldBroken += OnShieldBreak;
-            player.Respawned += ClearShake;
         }
         RenderPipelineManager.endCameraRendering += RestoreView;
     }
@@ -42,7 +41,6 @@ public sealed class CameraShake2D : MonoBehaviour
         {
             player.Damaged -= OnDamage;
             player.ShieldBroken -= OnShieldBreak;
-            player.Respawned -= ClearShake;
         }
         RenderPipelineManager.endCameraRendering -= RestoreView;
         ClearShake();

@@ -9,7 +9,7 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public sealed class PauseMenuController : MonoBehaviour
 {
-    private enum MenuState { Playing, Paused, Options, ReturningToMainMenu }
+    private enum MenuState { Playing, Paused, Options, ReturningToMainMenu, GameOver }
 
     [SerializeField] private PlayerController2D player;
     [SerializeField] private CameraShake2D cameraShake;
@@ -41,8 +41,24 @@ public sealed class PauseMenuController : MonoBehaviour
         pauseAction.action.performed -= OnPause;
         pauseAction.action.Disable();
         StopAllCoroutines();
-        if (state != MenuState.Playing)
+        if (state != MenuState.Playing && state != MenuState.GameOver)
             CloseMenu();
+    }
+
+    private void OnDestroy()
+    {
+        if (state == MenuState.GameOver)
+            Time.timeScale = previousTimeScale;
+    }
+
+    internal void BeginGameOver()
+    {
+        previousTimeScale = Time.timeScale;
+        state = MenuState.GameOver;
+        Time.timeScale = 0f;
+        player.SetGameplayPaused(true);
+        player.SetMenuInputSuspended(true);
+        cameraShake.SetMenuPaused(true);
     }
 
     private void OnPause(InputAction.CallbackContext context)

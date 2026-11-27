@@ -176,20 +176,6 @@ public sealed class PlayerController2D : MonoBehaviour
         ResetJumpState();
     }
 
-    public void RespawnAt(Vector3 position)
-    {
-        knockbackUntil = double.NegativeInfinity;
-        PrePhysicsVelocity = Vector2.zero;
-        transform.position = position;
-        body.position = position;
-        body.linearVelocity = Vector2.zero;
-        body.angularVelocity = 0f;
-        horizontalInput = 0f;
-        ResetJumpState();
-        Physics2D.SyncTransforms();
-        PreviousFootPosition = FootPosition;
-    }
-
     private void ResetJumpState()
     {
         jumpRequested = false;
